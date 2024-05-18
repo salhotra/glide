@@ -1,11 +1,22 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import CircularBox from './CircularContainer';
+import {Days} from '../constants';
 
 interface RoutineCardProps {
   name: string;
   time: string;
-  days: string;
+  days: typeof Days;
   onPress: () => void;
+}
+
+function isToday(day: string): boolean {
+  const today = new Date().toLocaleString('en-us', {weekday: 'short'});
+  return day === today;
+}
+
+function dayToSingleLetter(day: string): string {
+  return day.charAt(0);
 }
 
 const RoutineCard: React.FC<RoutineCardProps> = ({
@@ -18,18 +29,35 @@ const RoutineCard: React.FC<RoutineCardProps> = ({
     <TouchableOpacity style={styles.card} onPress={onPress}>
       <View style={styles.cardContent}>
         <Text style={styles.name}>{name}</Text>
+        <Text style={styles.elipse}>...</Text>
+      </View>
+      <View>
         <Text style={styles.time}>{time}</Text>
       </View>
       <View style={styles.cardFooter}>
         <View style={styles.daysContainer}>
-          {days.split(', ').map((day, index) => (
-            <Text key={index} style={styles.day}>
-              {day}
-            </Text>
-          ))}
+          {days.map((day, index) => {
+            const isTodayDay = isToday(day);
+            return (
+              <CircularBox
+                key={index}
+                size={20}
+                backgroundColor={isTodayDay ? '#000' : '#fff'}>
+                <Text
+                  style={StyleSheet.compose(
+                    styles.day,
+                    isTodayDay
+                      ? {
+                          color: '#fff',
+                        }
+                      : {},
+                  )}>
+                  {dayToSingleLetter(day)}
+                </Text>
+              </CircularBox>
+            );
+          })}
         </View>
-        <Text style={styles.elipse}>...</Text>
-        {/* <Ionicons name="ellipsis-horizontal" size={24} color="#999" /> */}
       </View>
     </TouchableOpacity>
   );
@@ -37,49 +65,44 @@ const RoutineCard: React.FC<RoutineCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '#fafafa',
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: {width: 0, height: 2},
-    elevation: 3,
   },
   cardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 2,
   },
   name: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '200',
     color: '#333',
   },
   time: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 12,
+    fontWeight: '200',
+    color: '#888',
   },
   cardFooter: {
+    marginTop: 15,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   daysContainer: {
     flexDirection: 'row',
   },
   day: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#999',
-    marginRight: 5,
   },
   elipse: {
     color: '#999',
     fontSize: 24,
-    fontWeight: 'bold',
-    marginRight: 5,
+    fontWeight: '500',
   },
 });
 
